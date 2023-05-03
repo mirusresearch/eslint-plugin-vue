@@ -38,6 +38,20 @@ tester.run('no-ref-object-destructure', rule, {
     const value3 = computed(() => fn(refs.count.value))
     `,
     `
+    import { storeToRefs } from 'pinia'
+    const { count } = storeToRefs(foo)
+    const value1 = computed(() => count.value)
+    const value2 = fn(count)
+    const value3 = computed(() => fn(count.value))
+    `,
+    `
+    import { storeToRefs } from 'pinia'
+    const refs = storeToRefs(foo)
+    const value1 = computed(() => refs.count.value)
+    const value2 = fn(refs.count)
+    const value3 = computed(() => fn(refs.count.value))
+    `,
+    `
     import { ref } from 'vue'
     const count = ref(0)
     count.value = 42
@@ -206,8 +220,60 @@ tester.run('no-ref-object-destructure', rule, {
     },
     {
       code: `
+      import { storeToRefs } from 'pinia'
+      const { count } = storeToRefs(foo)
+      const value1 = count.value
+      const { value: value2 } = count
+      const value3 = fn(count.value)
+      `,
+      errors: [
+        {
+          message:
+            'Getting a value from the ref object in the same scope will cause the value to lose reactivity.',
+          line: 4
+        },
+        {
+          message:
+            'Getting a value from the ref object in the same scope will cause the value to lose reactivity.',
+          line: 5
+        },
+        {
+          message:
+            'Getting a value from the ref object in the same scope will cause the value to lose reactivity.',
+          line: 6
+        }
+      ]
+    },
+    {
+      code: `
       import { toRefs } from 'vue'
       const refs = toRefs(foo)
+      const value1 = refs.count.value
+      const { value: value2 } = refs.count
+      const value3 = fn(refs.count.value)
+      `,
+      errors: [
+        {
+          message:
+            'Getting a value from the ref object in the same scope will cause the value to lose reactivity.',
+          line: 4
+        },
+        {
+          message:
+            'Getting a value from the ref object in the same scope will cause the value to lose reactivity.',
+          line: 5
+        },
+        {
+          message:
+            'Getting a value from the ref object in the same scope will cause the value to lose reactivity.',
+          line: 6
+        }
+      ]
+    },
+    {
+      code: `
+      import { storeToRefs } from 'pinia'
+      const refs = storeToRefs(foo)
       const value1 = refs.count.value
       const { value: value2 } = refs.count
       const value3 = fn(refs.count.value)
@@ -247,6 +313,21 @@ tester.run('no-ref-object-destructure', rule, {
       code: `
       import { toRefs } from 'vue'
       const refs = toRefs(foo)
+      const { foo = 42 } = refs
+      const v = foo.value
+      `,
+      errors: [
+        {
+          message:
+            'Getting a value from the ref object in the same scope will cause the value to lose reactivity.',
+          line: 5
+        }
+      ]
+    },
+    {
+      code: `
+      import { storeToRefs } from 'pinia'
+      const refs = storeToRefs(foo)
       const { foo = 42 } = refs
       const v = foo.value
       `,

@@ -207,6 +207,8 @@
   "toRef",
   "ToRefs",
   "toRefs",
+  "storeToRefs",
+  "StoreToRefs",
   "TrackOpTypes",
   "transformVNodeArgs",
   "TransitionHooks",
